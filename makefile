@@ -19,3 +19,10 @@ vulncheck:
 .PHONY: install
 install:
 	go mod tidy
+
+# wire
+# wire を使って DI するためのコードを生成する
+.PHONY: wire
+wire:
+	go install github.com/google/wire/cmd/wire@latest
+	cd internal/injector; wire
