@@ -1,15 +1,28 @@
 package main
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"log/slog"
+	"os"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/tomo1227/template_golang/internal/adapter/router"
+)
 
 func main() {
-	app := fiber.New()
+	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+	logger.Info("Start up the server...")
 
-	app.Get("/health", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{
-			"status": "OK!",
-		})
-	})
+	router, err := router.NewRouter()
+	startFiberServer(":8080", router.Fiber, logger)
+	if err != nil {
+		logger.Error("Failed to initialize router", "error: ", err)
+		os.Exit(1)
+	}
+}
 
-	app.Listen(":8080")
+// startFiberServer starts a REST server.
+func startFiberServer(port string, server *fiber.App, logger *slog.Logger) {
+	if err := server.Listen(port); err != nil {
+		logger.Error("Failed to start server: ", err)
+	}
 }
